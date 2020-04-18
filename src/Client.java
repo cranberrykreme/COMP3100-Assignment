@@ -21,19 +21,14 @@ public class Client {
 	private static final String AUTH =  "AUTH comp335";
 	private static final String QUIT = "QUIT";
 	private static final String REDY = "REDY";
-	private static final String OK = "OK";
-	private static final String RESC = "RESC ALL 1 200 1200";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	
-	int jobn =  0;
 	
 	public Client(String address, int port) {
 		try {
 			System.out.println("Attempting connection with " + address + " at port " + port);
 			socket = new Socket(address,port);
 			System.out.println("Connected");
-			
 			
 			//new message to Server
 			writeMSG(socket, HELO);
@@ -51,7 +46,6 @@ public class Client {
 			
 			//second message from server
 			readMSG(socket);
-			
 			
 			//third message to server
 			writeMSG(socket,REDY);
@@ -162,7 +156,6 @@ public class Client {
 					}
 				}
 			}
-			
 			
 			int largest = 0;
 			
