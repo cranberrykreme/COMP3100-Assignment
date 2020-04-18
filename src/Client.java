@@ -92,7 +92,7 @@ public class Client {
 		catch (IOException e) {
 			System.out.println(e);
 		}
-		
+		//close all the client communications and the socket
 		try {
 			inFromServer.close();
 			outToServer.close();
@@ -104,7 +104,11 @@ public class Client {
 		}
 	}
 	
-	
+	/*
+	 * Get the strings to send
+	 * get them in the right format to send
+	 * and send them to client
+	 */
 	private void writeMSG(Socket socket, String msg) throws IOException {
 		outToServer = socket.getOutputStream();
 		out = new DataOutputStream(outToServer);
@@ -113,7 +117,11 @@ public class Client {
 		System.out.println("messge sent to server: " + msg);
 		out.flush();
 	}
-	
+	/*
+	 * get message from server
+	 * print out that message has been received
+	 * use message in Client method
+	 */
 	private String readMSG(Socket socket) throws IOException {
 		inFromServer = socket.getInputStream();
 		in = new DataInputStream(inFromServer);
@@ -126,6 +134,10 @@ public class Client {
 		return str;
 	}
 	
+	/*
+	 * get information out of file and return
+	 * the largest server (the one with the most cores)
+	 */
 	private String parse(File file) {
 		try {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -172,6 +184,9 @@ public class Client {
 		return "Did not work";
 	}
 	
+	/*
+	 * initialize connection
+	 */
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
 	}
