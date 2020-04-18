@@ -39,7 +39,7 @@ public class Client {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("/home/comp335/ds-sim/system.xml");
+			File file = new File("system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
