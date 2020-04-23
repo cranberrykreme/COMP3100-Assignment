@@ -99,8 +99,10 @@ public class Client {
 	
 	/*
 	 * Get the strings to send
+	 * find location to send 
 	 * get them in the right format to send
 	 * and send them to client
+	 * 
 	 */
 	private void writeMSG(Socket socket, String msg) throws IOException {
 		outToServer = socket.getOutputStream();
