@@ -71,11 +71,11 @@ public class Client {
 						spaces++;
 					}
 					if(spaces == 4) {
-						index = i;
+						index = temp;
 						break;
 					}
 				}
-				String job = error.substring(14);
+				String job = error.substring(index);
 				writeMSG(socket, RESC + job);
 				
 				String servers = readMSG(socket);
