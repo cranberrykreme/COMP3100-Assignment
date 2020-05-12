@@ -94,7 +94,7 @@ public class Client {
 		}  catch (IOException i) {
 			System.out.println(i);
 		}
-	}
+	}//end of main class
 	
 	/*
 	 * Get the strings to send
