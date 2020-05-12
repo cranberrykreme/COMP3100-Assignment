@@ -22,7 +22,7 @@ public class Client {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	private static final String RESC = "RESC Avail ";
+	private static final String RESC = "RESC Avail";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -79,11 +79,11 @@ public class Client {
 				writeMSG(socket, RESC + job);
 				
 				String servers = readMSG(socket);
-				int j = 0;
-				while(!servers.substring(0, 1).contains(".") && j < 50) {
+				//writing OK while receiving info on servers,
+				//also checks if all info has been sent
+				while(!servers.substring(0, 1).contains(".")) {
 					writeMSG(socket,OK);
 					servers = readMSG(socket);
-					j++;
 				}
 
 				//job message to server
