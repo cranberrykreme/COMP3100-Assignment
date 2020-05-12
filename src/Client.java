@@ -22,6 +22,9 @@ public class Client {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
+	private static final String RESC = "RESC Avail";
+	private static final String OK = "OK";
+	private static final String ERR2 = "ERR: invalid command (OK)";
 	
 	public Client(String address, int port) {
 		try {
@@ -58,6 +61,17 @@ public class Client {
 				String error = readMSG(socket);
 				if(error.contains(NONE) || error.contains(ERR)) {
 					break;
+				}
+				
+				//sending resc command for specific job
+				String job = error.substring(14);
+				writeMSG(socket, RESC + job);
+				
+				String servers = readMSG(socket);
+				int j = 0;
+				while(servers != "." && j < 50) {
+					writeMSG(socket,OK);
+					servers = readMSG(socket);
 				}
 
 				//job message to server
