@@ -72,6 +72,7 @@ public class Client {
 				while(servers != "." && j < 50) {
 					writeMSG(socket,OK);
 					servers = readMSG(socket);
+					j++;
 				}
 
 				//job message to server
