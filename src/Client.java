@@ -39,7 +39,7 @@ public class Client {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("system.xml");
+			File file = new File("/home/comp335/ds-sim/system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -50,10 +50,15 @@ public class Client {
 			writeMSG(socket,REDY);
 			
 			//third message from server
-			readMSG(socket);
+			//readMSG(socket);
 			
 			int i = 0;
 			while(true) {
+				//reading job from server
+				String error = readMSG(socket);
+				if(error.contains(NONE) || error.contains(ERR)) {
+					break;
+				}
 
 				//job message to server
 				writeMSG(socket,"SCHD " + i + " " + ans + " 0");
@@ -66,12 +71,6 @@ public class Client {
 				
 				//send REDY
 				writeMSG(socket, REDY);
-				
-				String error = readMSG(socket);
-				
-				if(error.contains(NONE) || response.contains(ERR)) {
-					break;
-				}
 				i++;
 			}
 			
