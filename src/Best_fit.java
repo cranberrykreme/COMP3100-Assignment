@@ -270,14 +270,16 @@ public class Best_fit {
 
 	
 	
-	public static String fitnessvalue(String address, String job) {
+	public static Double fitnessvalue(String address, String job) {
 		String servercore = isolatecore(address, 4);
 		String jobcore = isolatecore(job,4);
 		
+		double fv =0;
+		fv = Double.parseDouble(servercore) - Double.parseDouble(jobcore);
 		
 		
 		
-		return null;
+		return fv;
 	}
 	
 	
