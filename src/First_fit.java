@@ -114,6 +114,7 @@ public class First_fit {
 				if(foundServer == null) {
 					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
 				} else {
+					foundServer = getNumb(foundServer,0);
 					writeMSG(socket,"SCHD " + i + " " + foundServer + " 0");
 				}
 				
@@ -257,7 +258,7 @@ public class First_fit {
 		System.out.println("address memory = " + memory + " job memory = " + jobMem);
 		System.out.println("address diskspace = " + diskspace + " job diskspace = " + jobDisk);
 		
-		if(Integer.parseInt(memory) > Integer.parseInt(jobMem) && Integer.parseInt(diskspace) > Integer.parseInt(jobDisk)) {
+		if(Double.parseDouble(memory) > Double.parseDouble(jobMem) && Double.parseDouble(diskspace) > Double.parseDouble(jobDisk)) {
 			hold = address;
 		}
 		
@@ -304,7 +305,12 @@ public class First_fit {
 		
 		
 		System.out.println("finalindex is: " + finalIndex);
-		numb = address.substring(subindex+1,finalIndex);
+		if(spaces != 0) {
+			numb = address.substring(subindex+1,finalIndex);
+		} else {
+			numb = address.substring(subindex,finalIndex);
+		}
+		
 		
 		System.out.println("string returned " + numb);
 		
