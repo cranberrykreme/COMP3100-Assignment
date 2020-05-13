@@ -50,7 +50,8 @@ public class First_fit {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("/home/comp335/ds-sim/system.xml");
+			File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
+			//File file = new File("/home/comp335/ds-sim/system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -160,7 +161,6 @@ public class First_fit {
 		out = new DataOutputStream(outToServer);
 		
 		out.write(msg.getBytes());
-		System.out.println("messge sent to server: " + msg);
 		out.flush();
 	}
 	/*
@@ -176,7 +176,6 @@ public class First_fit {
 		in.read(rMSG);
 		
 		String str = new String(rMSG);
-		System.out.println("message received from server: "  + str);
 		return str;
 	}
 	
@@ -243,11 +242,16 @@ public class First_fit {
 		String jobMem = null;
 		String jobDisk = null;
 		
+	
+		
 		memory = getNumb(address,5);
 		diskspace = getNumb(address,6);
 		
 		jobMem = getNumb(job,5);
-		diskspace = getNumb(job,6);
+		jobDisk = getNumb(job,6);
+		
+		System.out.println("address memory = " + memory + " job memory " + jobMem);
+		System.out.println("address diskspace = " + diskspace + " job diskspace " + jobDisk);
 		
 		if(Integer.parseInt(memory) > Integer.parseInt(jobMem) && Integer.parseInt(diskspace) > Integer.parseInt(jobDisk)) {
 			hold = address;
@@ -285,6 +289,8 @@ public class First_fit {
 		
 		numb = address.substring(subindex,finalIndex);
 		
+		System.out.println("string returned " + numb);
+		
 		return numb;
 	}
 	
@@ -292,7 +298,7 @@ public class First_fit {
 	 * initialize connection
 	 */
 	public static void main(String[] args) {
-		Client client = new Client("127.0.0.1", 50000);
+		First_fit ff = new First_fit("127.0.0.1", 50000);
 	}
 
 }

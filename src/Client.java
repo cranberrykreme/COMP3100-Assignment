@@ -42,8 +42,8 @@ public class Client {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			//File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
-			File file = new File("/home/comp335/ds-sim/system.xml");
+			File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
+			//File file = new File("/home/comp335/ds-sim/system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -135,7 +135,7 @@ public class Client {
 		out = new DataOutputStream(outToServer);
 		
 		out.write(msg.getBytes());
-		System.out.println("messge sent to server: " + msg);
+		//System.out.println("messge sent to server: " + msg);
 		out.flush();
 	}
 	/*
@@ -151,7 +151,7 @@ public class Client {
 		in.read(rMSG);
 		
 		String str = new String(rMSG);
-		System.out.println("message received from server: "  + str);
+		//System.out.println("message received from server: "  + str);
 		return str;
 	}
 	
