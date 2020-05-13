@@ -241,29 +241,75 @@ public class Worst_fit {
 	 * finds if a server can hold a certain job
 	 * if not returns null
 	 */
-	public static String wf(String server_add, String job) {
+	public static String wf(String server, String error) {
+		
+		int server_cores = Integer.parseInt(getNumb(server,4));
+		int job_cores = Integer.parseInt(getNumb(error,4));
+		
+		int server_mem = Integer.parseInt(getNumb(server,5));
+		int job_mem = Integer.parseInt(getNumb(error,5));
+		
+		int server_disk= Integer.parseInt(getNumb(server,6));
+		int job_disk = Integer.parseInt(getNumb(error,6));
+		
+		int serverState = Integer.parseInt(getNumb(server,2));
+		
 		
 		int worstFit = Integer.MIN_VALUE;
 		int altFit = Integer.MIN_VALUE;
 		
+		String wf_server = null;
+		String af_server = null;
+		
+		int fitness_val = server_cores - job_cores;
+		
+			
+		/**
+		 * Check if sufficient resources are available for a job
+		 */
 		
 		
-		return null;
+		if( server_cores >= job_cores && server_mem > job_mem && server_disk > job_disk) {
+			
+			if(fitness_val > worstFit &&  (serverState == 2 ||serverState == 3))
+			{
+				
+				worstFit = fitness_val;
+				wf_server = server;
+			}
+			
+			else if(fitness_val > altFit && (serverState != 2 ||serverState != 3))
+			{
+				altFit = fitness_val;
+				af_server = server;
+				
+			}
+		
+		}
+		
+		if(wf_server != null) {
+			return wf_server;
+		}
+		else if(af_server != null) {
+			return af_server;
+		}
+		else {
+			
+		//last line	
+			
+		}
+		
+		return wf_server;
 		
 	}
 	
-	public int fitness_val(String address, String job) {
-		
-		String server_cores = getNumb(address,4);
-		String job_cores = getNumb(job,4);
-		
-		int fv = Integer.parseInt(server_cores) - Integer.parseInt(job_cores);
-		
-		return fv;
-	}
+	
+	/**
+	 * Calculate Fitness value
+	 */
 	
 	
-	
+
 	
 	/**
 	 * Finds the number after a certain space
