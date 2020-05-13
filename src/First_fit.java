@@ -50,7 +50,7 @@ public class First_fit {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
+			File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
 			//File file = new File("/home/comp335/ds-sim/system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
@@ -114,8 +114,9 @@ public class First_fit {
 				if(foundServer == null) {
 					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
 				} else {
+					String servernum = getNumb(foundServer,1);
 					foundServer = getNumb(foundServer,0);
-					writeMSG(socket,"SCHD " + i + " " + foundServer + " 0");
+					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
 				}
 				
 				
