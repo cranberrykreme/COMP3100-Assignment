@@ -50,7 +50,7 @@ public class Worst_fit {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("/home/Downloads/ds-sim/system.xml");
+			File file = new File("system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -71,6 +71,7 @@ public class Worst_fit {
 			while(true) {
 				//reading job from server
 				String error = readMSG(socket);
+				System.out.println(error);
 				if(error.contains(NONE) || error.contains(ERR)) {
 					break;
 				}
@@ -93,23 +94,25 @@ public class Worst_fit {
 				writeMSG(socket, RESC + job);
 				
 				String servers = readMSG(socket);//sends back DATA
+				System.out.println(servers);
 				writeMSG(socket,OK);//sends ok
 				
 				servers = readMSG(socket);//first server info
-				
+			
 				String foundServer = null;
-				
+
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
 				while(!servers.substring(0, 1).contains(".")) {
+					System.out.println(servers);
 					
 					if(foundServer == null) {
 						foundServer = wf(servers, error);
 					}
-
+					
 					writeMSG(socket,OK);
 					servers = readMSG(socket); //going through the servers available
-					
+					System.out.println(servers);
 				}
 
 				//job message to server
@@ -241,18 +244,18 @@ public class Worst_fit {
 	 * finds if a server can hold a certain job
 	 * if not returns null
 	 */
-	public static String wf(String server, String error) {
+	public static String wf(String servers, String error) {
 		
-		int server_cores = Integer.parseInt(getNumb(server,4));
+		int server_cores = Integer.parseInt(getNumb(servers,4));
 		int job_cores = Integer.parseInt(getNumb(error,4));
 		
-		int server_mem = Integer.parseInt(getNumb(server,5));
+		int server_mem = Integer.parseInt(getNumb(servers,5));
 		int job_mem = Integer.parseInt(getNumb(error,5));
 		
-		int server_disk= Integer.parseInt(getNumb(server,6));
+		int server_disk= Integer.parseInt(getNumb(servers,6));
 		int job_disk = Integer.parseInt(getNumb(error,6));
 		
-		int serverState = Integer.parseInt(getNumb(server,2));
+		int serverState = Integer.parseInt(getNumb(servers,2));
 		
 		
 		int worstFit = Integer.MIN_VALUE;
@@ -275,13 +278,13 @@ public class Worst_fit {
 			{
 				
 				worstFit = fitness_val;
-				wf_server = server;
+				wf_server = servers;
 			}
 			
 			else if(fitness_val > altFit && (serverState != 2 ||serverState != 3))
 			{
 				altFit = fitness_val;
-				af_server = server;
+				af_server = servers;
 				
 			}
 		
@@ -302,12 +305,6 @@ public class Worst_fit {
 		return wf_server;
 		
 	}
-	
-	
-	/**
-	 * Calculate Fitness value
-	 */
-	
 	
 
 	
