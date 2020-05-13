@@ -63,6 +63,10 @@ public class First_fit {
 			//third message from server
 			//readMSG(socket);
 			
+			/**
+			 * method for going through the servers
+			 * and picking the right server for each job
+			 */
 			int i = 0;
 			while(true) {
 				//reading job from server
@@ -71,7 +75,7 @@ public class First_fit {
 					break;
 				}
 				
-				//sending resc command for specific job
+				//finding correct resc command for specific job
 				int spaces = 0;
 				int index = 0;
 				for(int temp = 0; temp < error.length(); temp++) {
@@ -83,31 +87,33 @@ public class First_fit {
 						break;
 					}
 				}
+				
+				//sending RESC command
 				String job = error.substring(index);
 				writeMSG(socket, RESC + job);
-				
 			
-				
-				String servers = readMSG(socket);
-				
-				
-				
+				String servers = readMSG(socket);//sends back DATA
+				String foundServer = null;
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
 				while(!servers.substring(0, 1).contains(".")) {
-					String temp = null;
-					while(temp == null) {
-					temp = ff(servers, job);
+					
+					if(foundServer == null) {
+						foundServer = ff(servers, job);
 					}
 
 					writeMSG(socket,OK);
-					servers = readMSG(socket);
-					
+					servers = readMSG(socket); //going through the servers available
 					
 				}
 
 				//job message to server
-				writeMSG(socket,"SCHD " + i + " " + ans + " 0");
+				if(foundServer == null) {
+					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
+				} else {
+					writeMSG(socket,"SCHD " + i + " " + foundServer + " 0");
+				}
+				
 				
 				//get response
 				String response = readMSG(socket);
@@ -223,35 +229,68 @@ public class First_fit {
 		return "Did not work";
 	}
 	
-	/*
-	 * initialize connection
+	
+	/**
+	 * finds if a server can hold a certain job
+	 * if not returns null
 	 */
-	
-	
 	public static String ff(String address, String job) {
 		String hold = null;
-		int spaces = 0;
-		int subindex =0;
+		
 		String memory = null;
 		String diskspace = null;
 		
+		String jobMem = null;
+		String jobDisk = null;
+		
+		memory = getNumb(address,5);
+		diskspace = getNumb(address,6);
+		
+		jobMem = getNumb(job,5);
+		diskspace = getNumb(job,6);
+		
+		if(Integer.parseInt(memory) > Integer.parseInt(jobMem) && Integer.parseInt(diskspace) > Integer.parseInt(jobDisk)) {
+			hold = address;
+		}
+		
+		return hold;
+		
+	}
+	
+	/**
+	 * Finds the number after a certain space
+	 * from both the job and the server information
+	 * memory info is held after space 5
+	 * diskspace info is held after space 6
+	 */
+	public static String getNumb(String address, int spaces) {
+		int spc = 0;
+		int subindex =0;
+		String numb = null;
+		
 		for(int temp = 0; temp < address.length(); temp++) {
 			if(address.charAt(temp) == ' ') {
-				spaces++;
+				spc++;
 			}
-			if(spaces == 5) {
+			if(spc == spaces) {
 				subindex = temp;
 				break;
 			}
 		}
 		
-		if(address.substring(subindex).compareTo(job) == 1) {
-			hold = address;
+		int finalIndex = subindex;
+		while(address.charAt(finalIndex) != ' ') {
+			finalIndex++;
 		}
-		return hold;
 		
+		numb = address.substring(subindex,finalIndex);
+		
+		return numb;
 	}
 	
+	/*
+	 * initialize connection
+	 */
 	public static void main(String[] args) {
 		Client client = new Client("127.0.0.1", 50000);
 	}
