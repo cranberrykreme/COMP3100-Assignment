@@ -96,9 +96,28 @@ public class Best_fit {
 				writeMSG(socket,OK);//sends ok
 				servers = readMSG(socket);//first server info
 				String foundServer = null;
+				
+				double bestFit = Double.MAX_VALUE;
+				double minAvail = Double.MAX_VALUE;
+				
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
+				String servertemp =null;
+				
 				while(!servers.substring(0, 1).contains(".")) {
+					double fit =0;
+					String availtime =null;
+					fit = fitnessvalue(address, error);
+					availtime = isolatecore(address, 3);
+					
+					if(bestFit > fit) {
+						bestFit = fit;
+						servertemp = address;
+					}
+					else if (bestFit == fit && minAvail > Double.parseDouble(availtime)) {
+					minAvail = Double.parseDouble(availtime);
+					}
+					
 					
 					if(foundServer == null) {
 						foundServer = ff(servers, error);
@@ -108,15 +127,28 @@ public class Best_fit {
 					servers = readMSG(socket); //going through the servers available
 					
 				}
-
-				//job message to server
-				if(foundServer == null) {
-					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
+				
+				
+				if(servertemp == null) {
+					writeMSG(socket,"SCHD" + i + " "+ans+ " 0");;
 				} else {
-					String servernum = getNumb(foundServer,1);
-					foundServer = getNumb(foundServer,0);
-					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+					String servernum = getNumb(servertemp,1);
+					foundServer = getNumb(servertemp,0);
+					writeMSG(socket,"SCHD " + i + " " + servertemp + " " +servernum);
 				}
+				
+//
+//				//job message to server
+//				if(foundServer == null) {
+//					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
+//				} else {
+//					String servernum = getNumb(foundServer,1);
+//					foundServer = getNumb(foundServer,0);
+//					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+//				}
+//				
+				
+				
 				
 				
 				//get response
@@ -283,34 +315,36 @@ public class Best_fit {
 	}
 	
 	
+	
 	public static String isolatecore(String address, int space) {
 		int count =0;
 		int firstspace = 0;
 		int lastspace = 0;
 		String corenum = null;
+		int temp = 0;
 		
 		for(int a=0; a<address.length(); a++) {
 			if(address.charAt(a)== ' ') {
 				count++;
 			}
 			if(count == space) {
-				firstspace = count;
+				firstspace = a+1;
 			}
-			if(count == space+1) {
-				lastspace=count;
+			if(count == space+2) {
+				lastspace=a;
 			}
 		}
 		
 		corenum = address.substring(firstspace, lastspace);
+		temp = Integer.parseInt(corenum);
 		
 		return corenum;
 	}
 	
 	
-	public static String bestf(String address, int spaces) {
-		
-		return null;
-	}
+//	public static String bestf(String address, String job) {
+//		return null;
+//	}
 	
 	/**
 	 * Finds the number after a certain space
