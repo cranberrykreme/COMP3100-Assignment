@@ -94,13 +94,15 @@ public class First_fit {
 				writeMSG(socket, RESC + job);
 			
 				String servers = readMSG(socket);//sends back DATA
+				writeMSG(socket,OK);//sends ok
+				servers = readMSG(socket);//first server info
 				String foundServer = null;
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
 				while(!servers.substring(0, 1).contains(".")) {
 					
 					if(foundServer == null) {
-						foundServer = ff(servers, job);
+						foundServer = ff(servers, error);
 					}
 
 					writeMSG(socket,OK);
@@ -161,6 +163,7 @@ public class First_fit {
 		out = new DataOutputStream(outToServer);
 		
 		out.write(msg.getBytes());
+		System.out.println("messge sent to server: " + msg);
 		out.flush();
 	}
 	/*
@@ -176,6 +179,7 @@ public class First_fit {
 		in.read(rMSG);
 		
 		String str = new String(rMSG);
+		System.out.println("message received from server: "  + str);
 		return str;
 	}
 	
@@ -250,8 +254,8 @@ public class First_fit {
 		jobMem = getNumb(job,5);
 		jobDisk = getNumb(job,6);
 		
-		System.out.println("address memory = " + memory + " job memory " + jobMem);
-		System.out.println("address diskspace = " + diskspace + " job diskspace " + jobDisk);
+		System.out.println("address memory = " + memory + " job memory = " + jobMem);
+		System.out.println("address diskspace = " + diskspace + " job diskspace = " + jobDisk);
 		
 		if(Integer.parseInt(memory) > Integer.parseInt(jobMem) && Integer.parseInt(diskspace) > Integer.parseInt(jobDisk)) {
 			hold = address;
@@ -269,8 +273,13 @@ public class First_fit {
 	 */
 	public static String getNumb(String address, int spaces) {
 		int spc = 0;
-		int subindex =0;
+		int subindex = 0;
 		String numb = null;
+		
+		if(address.length() < 10) {
+			System.out.println("address is too short at: " + address.length());
+			return null;
+		}
 		
 		for(int temp = 0; temp < address.length(); temp++) {
 			if(address.charAt(temp) == ' ') {
@@ -281,13 +290,21 @@ public class First_fit {
 				break;
 			}
 		}
+		System.out.println(spc + " subindex is: " + subindex);
 		
-		int finalIndex = subindex;
-		while(address.charAt(finalIndex) != ' ') {
-			finalIndex++;
+		
+		int finalIndex = subindex +1;
+		if(spaces <= 5) {
+			while(address.charAt(finalIndex) != ' ') {
+				finalIndex++;
+			}
+		} else {
+			finalIndex = address.length();
 		}
 		
-		numb = address.substring(subindex,finalIndex);
+		
+		System.out.println("finalindex is: " + finalIndex);
+		numb = address.substring(subindex+1,finalIndex);
 		
 		System.out.println("string returned " + numb);
 		
