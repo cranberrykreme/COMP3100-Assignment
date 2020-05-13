@@ -91,17 +91,36 @@ public class Worst_fit {
 				//sending RESC command
 				String job = error.substring(index);
 				writeMSG(socket, RESC + job);
-			
-				String servers = readMSG(socket);
+				
+				String servers = readMSG(socket);//sends back DATA
+				writeMSG(socket,OK);//sends ok
+				
+				servers = readMSG(socket);//first server info
+				
+				String foundServer = null;
+				
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
 				while(!servers.substring(0, 1).contains(".")) {
+					
+					if(foundServer == null) {
+						foundServer = wf(servers, error);
+					}
+
 					writeMSG(socket,OK);
-					servers = readMSG(socket);
+					servers = readMSG(socket); //going through the servers available
+					
 				}
 
 				//job message to server
-				writeMSG(socket,"SCHD " + i + " " + ans + " 0");
+				if(foundServer == null) {
+					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
+				} else {
+					String servernum = getNumb(foundServer,1);
+					foundServer = getNumb(foundServer,0);
+					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+				}
+				
 				
 				//get response
 				String response = readMSG(socket);
@@ -224,11 +243,78 @@ public class Worst_fit {
 	 */
 	public static String wf(String server_add, String job) {
 		
+		int worstFit = Integer.MIN_VALUE;
+		int altFit = Integer.MIN_VALUE;
+		
+		
 		
 		return null;
 		
 	}
 	
+	public int fitness_val(String address, String job) {
+		
+		String server_cores = getNumb(address,4);
+		String job_cores = getNumb(job,4);
+		
+		int fv = Integer.parseInt(server_cores) - Integer.parseInt(job_cores);
+		
+		return fv;
+	}
+	
+	
+	
+	
+	/**
+	 * Finds the number after a certain space
+	 * from both the job and the server information
+	 * memory info is held after space 5
+	 * diskspace info is held after space 6
+	 */
+	public static String getNumb(String address, int spaces) {
+		int spc = 0;
+		int subindex = 0;
+		String numb = null;
+		
+		if(address.length() < 10) {
+			System.out.println("address is too short at: " + address.length());
+			return null;
+		}
+		
+		for(int temp = 0; temp < address.length(); temp++) {
+			if(address.charAt(temp) == ' ') {
+				spc++;
+			}
+			if(spc == spaces) {
+				subindex = temp;
+				break;
+			}
+		}
+		System.out.println(spc + " subindex is: " + subindex);
+		
+		
+		int finalIndex = subindex +1;
+		if(spaces <= 5) {
+			while(address.charAt(finalIndex) != ' ') {
+				finalIndex++;
+			}
+		} else {
+			finalIndex = address.length();
+		}
+		
+		
+		System.out.println("finalindex is: " + finalIndex);
+		if(spaces != 0) {
+			numb = address.substring(subindex+1,finalIndex);
+		} else {
+			numb = address.substring(subindex,finalIndex);
+		}
+		
+		
+		System.out.println("string returned " + numb);
+		
+		return numb;
+	}
 	
 	/*
 	 * initialize connection
