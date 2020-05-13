@@ -267,7 +267,46 @@ public class Best_fit {
 	}
 	
 	
+
+	
+	
+	public static String fitnessvalue(String address, String job) {
+		String servercore = isolatecore(address, 4);
+		String jobcore = isolatecore(job,4);
+		
+		
+		
+		
+		return null;
+	}
+	
+	
+	public static String isolatecore(String address, int space) {
+		int count =0;
+		int firstspace = 0;
+		int lastspace = 0;
+		String corenum = null;
+		
+		for(int a=0; a<address.length(); a++) {
+			if(address.charAt(a)== ' ') {
+				count++;
+			}
+			if(count == space) {
+				firstspace = count;
+			}
+			if(count == space+1) {
+				lastspace=count;
+			}
+		}
+		
+		corenum = address.substring(firstspace, lastspace);
+		
+		return corenum;
+	}
+	
+	
 	public static String bestf(String address, int spaces) {
+		
 		return null;
 	}
 	
