@@ -302,14 +302,12 @@ public class Best_fit {
 
 	
 	
-	public static Double fitnessvalue(String address, String job) {
-		String servercore = isolatecore(address, 4);
-		String jobcore = isolatecore(job,4);
+	public static Integer fitnessvalue(String address, String job) {
+		String servercore = isolatecore(address, 3);
+		String jobcore = isolatecore(job,3);
 		
-		double fv =0;
-		fv = Double.parseDouble(servercore) - Double.parseDouble(jobcore);
-		
-		
+		int fv =0;
+		fv = Integer.parseInt(servercore) - Integer.parseInt(jobcore);
 		
 		return fv;
 	}
@@ -321,7 +319,6 @@ public class Best_fit {
 		int firstspace = 0;
 		int lastspace = 0;
 		String corenum = null;
-		int temp = 0;
 		
 		for(int a=0; a<address.length(); a++) {
 			if(address.charAt(a)== ' ') {
@@ -330,13 +327,12 @@ public class Best_fit {
 			if(count == space) {
 				firstspace = a+1;
 			}
-			if(count == space+2) {
+			if(count == space+1) {
 				lastspace=a;
 			}
 		}
 		
 		corenum = address.substring(firstspace, lastspace);
-		temp = Integer.parseInt(corenum);
 		
 		return corenum;
 	}
