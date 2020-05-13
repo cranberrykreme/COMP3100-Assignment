@@ -266,6 +266,11 @@ public class Best_fit {
 		
 	}
 	
+	
+	public static String bestf(String address, int spaces) {
+		return null;
+	}
+	
 	/**
 	 * Finds the number after a certain space
 	 * from both the job and the server information
