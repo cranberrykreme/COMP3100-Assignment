@@ -96,7 +96,7 @@ public class Best_fit {
 				String servers = readMSG(socket);//sends back DATA
 				writeMSG(socket,OK);//sends ok
 				servers = readMSG(socket);//first server info
-				String foundServer = null;
+				String foundServer = null;//to put the final server info into
 				
 				double bestFit = Double.MAX_VALUE;
 				double minAvail = Double.MAX_VALUE;
@@ -120,9 +120,7 @@ public class Best_fit {
 					}
 					
 					
-					if(foundServer == null) {
-						foundServer = ff(servers, error);
-					}
+					
 
 					writeMSG(socket,OK);
 					servers = readMSG(socket); //going through the servers available
@@ -252,38 +250,7 @@ public class Best_fit {
 		return "Did not work";
 	}
 	
-	
-	/**
-	 * finds if a server can hold a certain job
-	 * if not returns null
-	 */
-	public static String ff(String address, String job) {
-		String hold = null;
-		
-		String memory = null;
-		String diskspace = null;
-		
-		String jobMem = null;
-		String jobDisk = null;
-		
-	
-		
-		memory = getNumb(address,5);
-		diskspace = getNumb(address,6);
-		
-		jobMem = getNumb(job,5);
-		jobDisk = getNumb(job,6);
-		
-		System.out.println("address memory = " + memory + " job memory = " + jobMem);
-		System.out.println("address diskspace = " + diskspace + " job diskspace = " + jobDisk);
-		
-		if(Double.parseDouble(memory) > Double.parseDouble(jobMem) && Double.parseDouble(diskspace) > Double.parseDouble(jobDisk)) {
-			hold = address;
-		}
-		
-		return hold;
-		
-	}
+
 	
 	public static Integer fitnessvalue(String address, String job, int spaces) {
 		String servercore = getNumb(address, spaces);
