@@ -17,6 +17,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Worst_fit {
+
 	private Socket socket;
 	private OutputStream outToServer;
 	private DataOutputStream out;
@@ -29,7 +30,7 @@ public class Worst_fit {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	private static final String RESC = "RESC Capable";
+	private static final String RESC = "RESC Avail";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -49,10 +50,7 @@ public class Worst_fit {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			//File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
-			//File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
-			File file = new File("/home/comp335/ds-sim/system.xml");
-			//File file = new File("system.xml");
+			File file = new File("/home/Downloads/ds-sim/system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -73,6 +71,7 @@ public class Worst_fit {
 			while(true) {
 				//reading job from server
 				String error = readMSG(socket);
+				System.out.println(error);
 				if(error.contains(NONE) || error.contains(ERR)) {
 					break;
 				}
@@ -93,48 +92,82 @@ public class Worst_fit {
 				//sending RESC command
 				String job = error.substring(index);
 				writeMSG(socket, RESC + job);
-			
-				String servers = readMSG(socket);//sends back DATA
-				writeMSG(socket,OK);//sends ok
-				servers = readMSG(socket);//first server info
-				String foundServer = null;//to put the final server info into
 				
+				String servers = readMSG(socket);//sends back DATA
+				System.out.println(servers);
+				writeMSG(socket,OK);//sends ok
+				
+				servers = readMSG(socket);//first server info
+			
+				String foundServer = null;
+
 				double worstFit = Double.MIN_VALUE;
 				double altFit = Double.MIN_VALUE;
 				
+				String wf_server = null;
+				String af_server = null;
+				
+				
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
-				String servertemp =null;
-				
 				while(!servers.substring(0, 1).contains(".")) {
-					double fit =0;
-					//double availtime =0;
-					fit = fitnessvalue(servers, error, 4);
-					//availtime = fitnessvalue(servers, error, 3);
+					String server_cores = getNumb(servers,4);
+					String job_cores = getNumb(error,4);
 					
-					if(worstFit < fit && fit >= 0) {
-						worstFit = fit;
-						servertemp = servers;
-					}
-					else if (altFit < fit) {
-						altFit = fit;
-						servertemp = servers;
-					}
+					String server_mem = getNumb(servers,5);
+					String job_mem = getNumb(error,5);
+					
+					String server_disk= getNumb(servers,6);
+					String job_disk = getNumb(error,6);
+					
+					/*String serverState = getNumb(servers,2);*/
+					
 				
+					/*
+					 * Check for enough resources availability
+					 */
+					if( (Integer.parseInt(server_cores) >= Integer.parseInt(job_cores)) && (Integer.parseInt(server_mem) >= Integer.parseInt(job_mem)) && (Integer.parseInt(server_disk) >= Integer.parseInt(job_disk))) 
+					{
+				
+					double fitness_val = 0;
+					fitness_val= Fitness_val(servers, error, 4);
+					
+					String serverState = getNumb(servers,2);
+					
+					if((fitness_val > worstFit)  && (Integer.parseInt(serverState) == 2 ||Integer.parseInt(serverState) == 3))
+					{
+						worstFit = fitness_val;
+						wf_server = servers;
+					}
+						
+					else if((fitness_val > altFit)  && (Integer.parseInt(serverState) != 2 ||Integer.parseInt(serverState) != 3))
+					{
+						altFit = fitness_val;
+						af_server = servers;
+							
+					}
+					}
 					writeMSG(socket,OK);
 					servers = readMSG(socket); //going through the servers available
 					
 				}
 				
-				//if no best_fit server is found, return largest server
-				if(servertemp == null) {
-					writeMSG(socket,"SCHD" + i + " "+ans+ " 0");;
-				} else {
-					String servernum = getNumb(servertemp,1);
-					foundServer = getNumb(servertemp,0);
+				if(wf_server != null) {
+					String servernum = getNumb(wf_server,1);
+					foundServer = getNumb(wf_server,0);
 					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
 				}
-				
+				else if(af_server != null) {
+					String servernum = getNumb(af_server,1);
+					foundServer = getNumb(af_server,0);
+					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+				}
+				else {
+					writeMSG(socket,"SCHD" + i + " "+ ans + " 0");
+				}
+
+
+					
 				//get response
 				String response = readMSG(socket);
 				if(response.contains(NONE) || response.contains(ERR)) {
@@ -203,7 +236,6 @@ public class Worst_fit {
 	/*
 	 * get information out of file and return
 	 * the largest server (the one with the most cores)
-	 * used in this as a backup way of allocating jobs
 	 */
 	private String parse(File file) {
 		try {
@@ -249,49 +281,30 @@ public class Worst_fit {
 		
 		return "Did not work";
 	}
+		
 	
-
+	/**
+	 * Calculate the fitness value
+	 * 
+	 */
 	
-	public static Integer fitnessvalue(String address, String job, int spaces) {
+	
+	public static int Fitness_val(String address, String job, int spaces) {
 		String servercore = getNumb(address, spaces);
 		String jobcore = getNumb(job,spaces);
 		
-		int fv =0;
+		int fv = 0;
 		fv = Integer.parseInt(servercore) - Integer.parseInt(jobcore);
 		
 		return fv;
 	}
 	
 	
-	
-	public static String isolatecore(String address, int space) {
-		int count =0;
-		int firstspace = 0;
-		int lastspace = 0;
-		String corenum = null;
-		
-		for(int a=0; a<address.length(); a++) {
-			if(address.charAt(a)== ' ') {
-				count++;
-			}
-			if(count == space) {
-				firstspace = a+1;
-			}
-			if(count == space+1) {
-				lastspace=a;
-			}
-		}
-		
-		corenum = address.substring(firstspace, lastspace);
-		
-		return corenum;
-	}
+
 	
 	/**
 	 * Finds the number after a certain space
 	 * from both the job and the server information
-	 * available time is held after space 3
-	 * #CPU cores is held after space 4
 	 * memory info is held after space 5
 	 * diskspace info is held after space 6
 	 */
@@ -345,7 +358,7 @@ public class Worst_fit {
 	 * initialize connection
 	 */
 	public static void main(String[] args) {
-		Worst_fit bf = new Worst_fit("127.0.0.1", 50000);
+		Worst_fit wf = new Worst_fit("127.0.0.1", 50000);
 	}
-}
 
+}
