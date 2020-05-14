@@ -29,7 +29,7 @@ public class Best_fit {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	private static final String RESC = "RESC Avail";
+	private static final String RESC = "RESC Capable";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -50,8 +50,9 @@ public class Best_fit {
 			
 			//parse system.xml
 			//File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
-			File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
-			//File file = new File("/home/comp335/ds-sim/system.xml");
+			//File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
+			File file = new File("/home/comp335/ds-sim/system.xml");
+			//File file = new File("system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -111,17 +112,15 @@ public class Best_fit {
 					fit = fitnessvalue(servers, error, 4);
 					availtime = fitnessvalue(servers, error, 3);
 					
-					if(bestFit > fit) {
+					if(bestFit > fit && fit >= 0) {
 						bestFit = fit;
 						servertemp = servers;
 					}
 					else if (bestFit == fit && minAvail > availtime) {
 						minAvail = availtime;
+						servertemp = servers;
 					}
-					
-					
-					
-
+				
 					writeMSG(socket,OK);
 					servers = readMSG(socket); //going through the servers available
 					
@@ -204,6 +203,7 @@ public class Best_fit {
 	/*
 	 * get information out of file and return
 	 * the largest server (the one with the most cores)
+	 * used in this as a backup way of allocating jobs
 	 */
 	private String parse(File file) {
 		try {
@@ -287,14 +287,11 @@ public class Best_fit {
 		return corenum;
 	}
 	
-	
-//	public static String bestf(String address, String job) {
-//		return null;
-//	}
-	
 	/**
 	 * Finds the number after a certain space
 	 * from both the job and the server information
+	 * available time is held after space 3
+	 * #CPU cores is held after space 4
 	 * memory info is held after space 5
 	 * diskspace info is held after space 6
 	 */
