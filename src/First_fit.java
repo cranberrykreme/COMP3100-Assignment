@@ -113,7 +113,6 @@ public class First_fit {
 					
 					double isa = Double.parseDouble(isAvail);
 					
-					
 					if(foundServer == null && isa >=0) {
 						foundServer = ff(servers, error);
 					}
