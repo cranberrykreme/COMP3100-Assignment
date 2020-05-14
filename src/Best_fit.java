@@ -107,12 +107,12 @@ public class Best_fit {
 				while(!servers.substring(0, 1).contains(".")) {
 					double fit =0;
 					String availtime =null;
-					fit = fitnessvalue(address, error);
-					availtime = isolatecore(address, 3);
+					fit = fitnessvalue(servers, error);
+					availtime = isolatecore(servers, 3);
 					
 					if(bestFit > fit) {
 						bestFit = fit;
-						servertemp = address;
+						servertemp = servers;
 					}
 					else if (bestFit == fit && minAvail > Double.parseDouble(availtime)) {
 					minAvail = Double.parseDouble(availtime);
@@ -303,11 +303,13 @@ public class Best_fit {
 	
 	
 	public static Integer fitnessvalue(String address, String job) {
-		String servercore = isolatecore(address, 3);
-		String jobcore = isolatecore(job,3);
+		String servercore = isolatecore(address, 4);
+		String jobcore = isolatecore(job,4);
 		
 		int fv =0;
-		fv = Integer.parseInt(servercore) - Integer.parseInt(jobcore);
+		int a = Integer.parseInt(servercore);
+		int b = Integer.parseInt(jobcore);
+		fv = a-b;
 		
 		return fv;
 	}
@@ -327,7 +329,7 @@ public class Best_fit {
 			if(count == space) {
 				firstspace = a+1;
 			}
-			if(count == space+1) {
+			if(count == space+2) {
 				lastspace=a;
 			}
 		}
