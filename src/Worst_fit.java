@@ -17,7 +17,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Worst_fit {
-
 	private Socket socket;
 	private OutputStream outToServer;
 	private DataOutputStream out;
@@ -30,7 +29,7 @@ public class Worst_fit {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	private static final String RESC = "RESC Avail";
+	private static final String RESC = "RESC Capable";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -50,7 +49,10 @@ public class Worst_fit {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("system.xml");
+			//File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
+			//File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
+			File file = new File("/home/comp335/ds-sim/system.xml");
+			//File file = new File("system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -71,7 +73,6 @@ public class Worst_fit {
 			while(true) {
 				//reading job from server
 				String error = readMSG(socket);
-				System.out.println(error);
 				if(error.contains(NONE) || error.contains(ERR)) {
 					break;
 				}
@@ -92,38 +93,47 @@ public class Worst_fit {
 				//sending RESC command
 				String job = error.substring(index);
 				writeMSG(socket, RESC + job);
-				
-				String servers = readMSG(socket);//sends back DATA
-				System.out.println(servers);
-				writeMSG(socket,OK);//sends ok
-				
-				servers = readMSG(socket);//first server info
 			
-				String foundServer = null;
-
+				String servers = readMSG(socket);//sends back DATA
+				writeMSG(socket,OK);//sends ok
+				servers = readMSG(socket);//first server info
+				String foundServer = null;//to put the final server info into
+				
+				double worstFit = Double.MIN_VALUE;
+				double altFit = Double.MIN_VALUE;
+				
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
+				String servertemp =null;
+				
 				while(!servers.substring(0, 1).contains(".")) {
-					System.out.println(servers);
+					double fit =0;
+					//double availtime =0;
+					fit = fitnessvalue(servers, error, 4);
+					//availtime = fitnessvalue(servers, error, 3);
 					
-					if(foundServer == null) {
-						foundServer = wf(servers, error);
+					if(worstFit < fit && fit >= 0) {
+						worstFit = fit;
+						servertemp = servers;
 					}
-					
+					else if (altFit < fit) {
+						altFit = fit;
+						servertemp = servers;
+					}
+				
 					writeMSG(socket,OK);
 					servers = readMSG(socket); //going through the servers available
-					System.out.println(servers);
-				}
-
-				//job message to server
-				if(foundServer == null) {
-					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
-				} else {
-					String servernum = getNumb(foundServer,1);
-					foundServer = getNumb(foundServer,0);
-					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+					
 				}
 				
+				//if no best_fit server is found, return largest server
+				if(servertemp == null) {
+					writeMSG(socket,"SCHD" + i + " "+ans+ " 0");;
+				} else {
+					String servernum = getNumb(servertemp,1);
+					foundServer = getNumb(servertemp,0);
+					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+				}
 				
 				//get response
 				String response = readMSG(socket);
@@ -193,6 +203,7 @@ public class Worst_fit {
 	/*
 	 * get information out of file and return
 	 * the largest server (the one with the most cores)
+	 * used in this as a backup way of allocating jobs
 	 */
 	private String parse(File file) {
 		try {
@@ -239,78 +250,48 @@ public class Worst_fit {
 		return "Did not work";
 	}
 	
+
 	
-	/**
-	 * finds if a server can hold a certain job
-	 * if not returns null
-	 */
-	public static String wf(String servers, String error) {
+	public static Integer fitnessvalue(String address, String job, int spaces) {
+		String servercore = getNumb(address, spaces);
+		String jobcore = getNumb(job,spaces);
 		
-		int server_cores = Integer.parseInt(getNumb(servers,4));
-		int job_cores = Integer.parseInt(getNumb(error,4));
+		int fv =0;
+		fv = Integer.parseInt(servercore) - Integer.parseInt(jobcore);
 		
-		int server_mem = Integer.parseInt(getNumb(servers,5));
-		int job_mem = Integer.parseInt(getNumb(error,5));
-		
-		int server_disk= Integer.parseInt(getNumb(servers,6));
-		int job_disk = Integer.parseInt(getNumb(error,6));
-		
-		int serverState = Integer.parseInt(getNumb(servers,2));
-		
-		
-		int worstFit = Integer.MIN_VALUE;
-		int altFit = Integer.MIN_VALUE;
-		
-		String wf_server = null;
-		String af_server = null;
-		
-		int fitness_val = server_cores - job_cores;
-		
-			
-		/**
-		 * Check if sufficient resources are available for a job
-		 */
-		
-		
-		if( server_cores >= job_cores && server_mem > job_mem && server_disk > job_disk) {
-			
-			if(fitness_val > worstFit &&  (serverState == 2 ||serverState == 3))
-			{
-				
-				worstFit = fitness_val;
-				wf_server = servers;
-			}
-			
-			else if(fitness_val > altFit && (serverState != 2 ||serverState != 3))
-			{
-				altFit = fitness_val;
-				af_server = servers;
-				
-			}
-		
-		}
-		
-		if(wf_server != null) {
-			return wf_server;
-		}
-		else if(af_server != null) {
-			return af_server;
-		}
-		else {
-			
-		//last line	
-			
-		}
-		
-		return wf_server;
-		
+		return fv;
 	}
 	
-
+	
+	
+	public static String isolatecore(String address, int space) {
+		int count =0;
+		int firstspace = 0;
+		int lastspace = 0;
+		String corenum = null;
+		
+		for(int a=0; a<address.length(); a++) {
+			if(address.charAt(a)== ' ') {
+				count++;
+			}
+			if(count == space) {
+				firstspace = a+1;
+			}
+			if(count == space+1) {
+				lastspace=a;
+			}
+		}
+		
+		corenum = address.substring(firstspace, lastspace);
+		
+		return corenum;
+	}
 	
 	/**
 	 * Finds the number after a certain space
 	 * from both the job and the server information
+	 * available time is held after space 3
+	 * #CPU cores is held after space 4
 	 * memory info is held after space 5
 	 * diskspace info is held after space 6
 	 */
@@ -319,7 +300,7 @@ public class Worst_fit {
 		int subindex = 0;
 		String numb = null;
 		
-		if(address.length() < 10) {
+		if(address.length() < 5) {
 			System.out.println("address is too short at: " + address.length());
 			return null;
 		}
@@ -334,6 +315,7 @@ public class Worst_fit {
 			}
 		}
 		System.out.println(spc + " subindex is: " + subindex);
+		System.out.println(address);
 		
 		
 		int finalIndex = subindex +1;
@@ -363,7 +345,7 @@ public class Worst_fit {
 	 * initialize connection
 	 */
 	public static void main(String[] args) {
-		Worst_fit wf = new Worst_fit("127.0.0.1", 50000);
+		Worst_fit bf = new Worst_fit("127.0.0.1", 50000);
 	}
-
 }
+
