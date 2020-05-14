@@ -115,6 +115,7 @@ public class Best_fit {
 					if(bestFit > fit && fit >= 0) {
 						bestFit = fit;
 						servertemp = servers;
+						minAvail = availtime;
 					}
 					else if (bestFit == fit && minAvail > availtime) {
 						minAvail = availtime;
