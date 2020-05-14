@@ -69,7 +69,6 @@ public class Best_fit {
 			 * method for going through the servers
 			 * and picking the right server for each job
 			 */
-			int i = 0;
 			while(true) {
 				//reading job from server
 				String error = readMSG(socket);
@@ -95,7 +94,11 @@ public class Best_fit {
 				writeMSG(socket, RESC + job);
 			
 				String servers = readMSG(socket);//sends back DATA
-				writeMSG(socket,OK);//sends ok
+				
+				
+				writeMSG(socket,OK);//sends OK
+				
+				
 				servers = readMSG(socket);//first server info
 				String foundServer = null;//to put the final server info into
 				
@@ -127,13 +130,14 @@ public class Best_fit {
 					
 				}
 				
+				String jobN = getNumb(error, 2);
 				//if no best_fit server is found, return largest server
 				if(servertemp == null) {
-					writeMSG(socket,"SCHD" + i + " "+ans+ " 0");;
+					writeMSG(socket,"SCHD" + jobN + " "+ans+ " 0");;
 				} else {
 					String servernum = getNumb(servertemp,1);
 					foundServer = getNumb(servertemp,0);
-					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+					writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum);
 				}
 				
 				//get response
@@ -144,7 +148,6 @@ public class Best_fit {
 				
 				//send REDY
 				writeMSG(socket, REDY);
-				i++;
 			}
 			
 			//LAST STAGE: QUIT
