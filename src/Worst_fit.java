@@ -50,7 +50,7 @@ public class Worst_fit {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("/home/Downloads/ds-sim/system.xml");
+			File file = new File("system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
@@ -111,23 +111,6 @@ public class Worst_fit {
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
 				while(!servers.substring(0, 1).contains(".")) {
-					String server_cores = getNumb(servers,4);
-					String job_cores = getNumb(error,4);
-					
-					String server_mem = getNumb(servers,5);
-					String job_mem = getNumb(error,5);
-					
-					String server_disk= getNumb(servers,6);
-					String job_disk = getNumb(error,6);
-					
-					/*String serverState = getNumb(servers,2);*/
-					
-				
-					/*
-					 * Check for enough resources availability
-					 */
-					if( (Integer.parseInt(server_cores) >= Integer.parseInt(job_cores)) && (Integer.parseInt(server_mem) >= Integer.parseInt(job_mem)) && (Integer.parseInt(server_disk) >= Integer.parseInt(job_disk))) 
-					{
 				
 					double fitness_val = 0;
 					fitness_val= Fitness_val(servers, error, 4);
@@ -146,7 +129,7 @@ public class Worst_fit {
 						af_server = servers;
 							
 					}
-					}
+					
 					writeMSG(socket,OK);
 					servers = readMSG(socket); //going through the servers available
 					
