@@ -50,8 +50,8 @@ public class Best_fit {
 			
 			//parse system.xml
 			//File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
-			//File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
-			File file = new File("/home/comp335/ds-sim/system.xml");
+			File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
+			//File file = new File("/home/comp335/ds-sim/system.xml");
 			//File file = new File("system.xml");
 			String ans = parse(file);
 			System.out.println(ans);

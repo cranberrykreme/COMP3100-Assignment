@@ -30,7 +30,7 @@ public class First_fit {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	private static final String RESC = "RESC Avail";
+	private static final String RESC = "RESC Capable";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -40,27 +40,34 @@ public class First_fit {
 			socket = new Socket(address,port);
 			System.out.println("Connected");
 			
+			outToServer = socket.getOutputStream();
+			out = new DataOutputStream(outToServer);
+			
+			inFromServer = socket.getInputStream();
+			in = new DataInputStream(inFromServer);
+			
 			//new message to Server
-			writeMSG(socket, HELO);
+			writeMSG(socket, HELO, out);
 			
 			//receive message from Server
-			readMSG(socket);
+			readMSG(socket, in);
 			
 			//second message to server
-			writeMSG(socket, AUTH);
+			writeMSG(socket, AUTH, out);
 			
 			//parse system.xml
 			//File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
 			//File file = new File("/home/comp335/ds-sim/system.xml");
-			File file = new File("system.xml");
+			//File file = new File("system.xml");
+			File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
 			
 			//second message from server
-			readMSG(socket);
+			readMSG(socket, in);
 			
 			//third message to server
-			writeMSG(socket,REDY);
+			writeMSG(socket,REDY, out);
 			
 			//third message from server
 			//readMSG(socket);
@@ -72,7 +79,7 @@ public class First_fit {
 			int i = 0;
 			while(true) {
 				//reading job from server
-				String error = readMSG(socket);
+				String error = readMSG(socket, in);
 				if(error.contains(NONE) || error.contains(ERR)) {
 					break;
 				}
@@ -92,49 +99,54 @@ public class First_fit {
 				
 				//sending RESC command
 				String job = error.substring(index);
-				writeMSG(socket, RESC + job);
+				writeMSG(socket, RESC + job, out);
 			
-				String servers = readMSG(socket);//sends back DATA
-				writeMSG(socket,OK);//sends ok
-				servers = readMSG(socket);//first server info
+				String servers = readMSG(socket, in);//sends back DATA
+				
+				writeMSG(socket,OK, out);//sends ok
+				servers = readMSG(socket, in);//first server info
 				String foundServer = null;
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
 				while(!servers.substring(0, 1).contains(".")) {
+					String isAvail = getNumb(servers, 3);
 					
-					if(foundServer == null) {
+					double isa = Double.parseDouble(isAvail);
+					
+					
+					if(foundServer == null && isa >=0) {
 						foundServer = ff(servers, error);
 					}
 
-					writeMSG(socket,OK);
-					servers = readMSG(socket); //going through the servers available
+					writeMSG(socket,OK, out);
+					servers = readMSG(socket, in); //going through the servers available
 					
 				}
-
+				String jobN = getNumb(error, 2);
 				//job message to server
 				if(foundServer == null) {
-					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
+					writeMSG(socket,"SCHD " + jobN + " " + ans + " 0", out);
 				} else {
 					String servernum = getNumb(foundServer,1);
 					foundServer = getNumb(foundServer,0);
-					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+					writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum,out);
 				}
 				
 				
 				//get response
-				String response = readMSG(socket);
+				String response = readMSG(socket, in);
 				if(response.contains(NONE) || response.contains(ERR)) {
 					break;
 				}
 				
 				//send REDY
-				writeMSG(socket, REDY);
+				writeMSG(socket, REDY, out);
 				i++;
 			}
 			
 			//LAST STAGE: QUIT
-			writeMSG(socket, QUIT);
-			readMSG(socket);
+			writeMSG(socket, QUIT, out);
+			readMSG(socket, in);
 			
 		}  catch (UnknownHostException u) {
 			System.out.println(u);
@@ -154,6 +166,16 @@ public class First_fit {
 		}
 	}//end of main class
 	
+	public static Integer activeServer(String address, String job, int spaces) {
+		String servercore = getNumb(address, spaces);
+		String jobcore = getNumb(job,spaces);
+		
+		int as =0;
+		as = Integer.parseInt(servercore) - Integer.parseInt(jobcore);
+		
+		return as;
+	}
+	
 	/*
 	 * Get the strings to send
 	 * find location to send 
@@ -161,10 +183,7 @@ public class First_fit {
 	 * and send them to client
 	 * 
 	 */
-	private void writeMSG(Socket socket, String msg) throws IOException {
-		outToServer = socket.getOutputStream();
-		out = new DataOutputStream(outToServer);
-		
+	private void writeMSG(Socket socket, String msg, DataOutputStream out) throws IOException {
 		out.write(msg.getBytes());
 		System.out.println("messge sent to server: " + msg);
 		out.flush();
@@ -174,9 +193,8 @@ public class First_fit {
 	 * print out that message has been received
 	 * use message in Client method
 	 */
-	private String readMSG(Socket socket) throws IOException {
-		inFromServer = socket.getInputStream();
-		in = new DataInputStream(inFromServer);
+	private String readMSG(Socket socket, DataInputStream in) throws IOException {
+		
 		
 		byte[] rMSG = new byte[1024];
 		in.read(rMSG);
@@ -184,6 +202,7 @@ public class First_fit {
 		String str = new String(rMSG);
 		System.out.println("message received from server: "  + str);
 		return str;
+		
 	}
 	
 	/*
