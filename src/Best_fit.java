@@ -49,7 +49,8 @@ public class Best_fit {
 			writeMSG(socket, AUTH);
 			
 			//parse system.xml
-			File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
+			//File file = new File("/Users/garyguan/Downloads/ds-sim/system.xml");
+			File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
 			//File file = new File("/home/comp335/ds-sim/system.xml");
 			String ans = parse(file);
 			System.out.println(ans);
@@ -106,16 +107,16 @@ public class Best_fit {
 				
 				while(!servers.substring(0, 1).contains(".")) {
 					double fit =0;
-					String availtime =null;
-					fit = fitnessvalue(address, error);
-					availtime = isolatecore(address, 3);
+					double availtime =0;
+					fit = fitnessvalue(servers, error, 4);
+					availtime = fitnessvalue(servers, error, 3);
 					
 					if(bestFit > fit) {
 						bestFit = fit;
-						servertemp = address;
+						servertemp = servers;
 					}
-					else if (bestFit == fit && minAvail > Double.parseDouble(availtime)) {
-					minAvail = Double.parseDouble(availtime);
+					else if (bestFit == fit && minAvail > availtime) {
+						minAvail = availtime;
 					}
 					
 					
@@ -128,28 +129,14 @@ public class Best_fit {
 					
 				}
 				
-				
+				//if no best_fit server is found, return largest server
 				if(servertemp == null) {
 					writeMSG(socket,"SCHD" + i + " "+ans+ " 0");;
 				} else {
 					String servernum = getNumb(servertemp,1);
 					foundServer = getNumb(servertemp,0);
-					writeMSG(socket,"SCHD " + i + " " + servertemp + " " +servernum);
+					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
 				}
-				
-//
-//				//job message to server
-//				if(foundServer == null) {
-//					writeMSG(socket,"SCHD " + i + " " + ans + " 0");
-//				} else {
-//					String servernum = getNumb(foundServer,1);
-//					foundServer = getNumb(foundServer,0);
-//					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
-//				}
-//				
-				
-				
-				
 				
 				//get response
 				String response = readMSG(socket);
@@ -298,13 +285,9 @@ public class Best_fit {
 		
 	}
 	
-	
-
-	
-	
-	public static Integer fitnessvalue(String address, String job) {
-		String servercore = isolatecore(address, 3);
-		String jobcore = isolatecore(job,3);
+	public static Integer fitnessvalue(String address, String job, int spaces) {
+		String servercore = getNumb(address, spaces);
+		String jobcore = getNumb(job,spaces);
 		
 		int fv =0;
 		fv = Integer.parseInt(servercore) - Integer.parseInt(jobcore);
@@ -353,7 +336,7 @@ public class Best_fit {
 		int subindex = 0;
 		String numb = null;
 		
-		if(address.length() < 10) {
+		if(address.length() < 5) {
 			System.out.println("address is too short at: " + address.length());
 			return null;
 		}
@@ -368,6 +351,7 @@ public class Best_fit {
 			}
 		}
 		System.out.println(spc + " subindex is: " + subindex);
+		System.out.println(address);
 		
 		
 		int finalIndex = subindex +1;
