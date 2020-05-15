@@ -71,7 +71,6 @@ public class Worst_fit {
 			while(true) {
 				//reading job from server
 				String error = readMSG(socket);
-				System.out.println(error);
 				if(error.contains(NONE) || error.contains(ERR)) {
 					break;
 				}
@@ -157,21 +156,21 @@ public class Worst_fit {
 					serversCapable = readMSG(socket);//first server info
 					String foundServerCapable = null;
 					
-					worstFit = Double.MIN_VALUE;
-					wf_server = null;
+					double worstFitCapable = Double.MIN_VALUE;
+					String wf_serverCapable = null;
 					
 					String serverState = getNumb(serversCapable,2);
 					
 					
 					while(!serversCapable.substring(0, 1).contains(".")) {
-						double fitCapable =0;
 						
+						double fitCapable =0;
 						fitCapable = Fitness_val(serversCapable, error, 4);
 					
 						
-						if(fitCapable > worstFit && (Integer.parseInt(serverState) == 2)) {
+						if(fitCapable > worstFitCapable && (Integer.parseInt(serverState) == 3)) {
 							
-							worstFit = fitCapable;
+							worstFitCapable = fitCapable;
 							wf_server = serversCapable;
 						}
 						
@@ -179,9 +178,9 @@ public class Worst_fit {
 						serversCapable = readMSG(socket); 
 					}
 						
-					String activesnum = getNumb(wf_server,1);
-					foundServerCapable = getNumb(wf_server,0);
-					writeMSG(socket,"SCHD " + jobN + " " + foundServerCapable + " " +activesnum);
+					String activenum = getNumb(wf_serverCapable,1);
+					foundServerCapable = getNumb(wf_serverCapable,0);
+					writeMSG(socket,"SCHD " + jobN + " " + foundServerCapable + " " +activenum);
 	
 				}
 
