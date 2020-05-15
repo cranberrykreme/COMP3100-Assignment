@@ -29,7 +29,8 @@ public class Best_fit {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	private static final String RESC = "RESC Capable";
+	private static final String RESC = "RESC Avail";
+	private static final String RESCCapable = "RESC Capable";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -105,9 +106,12 @@ public class Best_fit {
 				double bestFit = Double.MAX_VALUE;
 				double minAvail = Double.MAX_VALUE;
 				
+				
+				
 				//writing OK while receiving info on servers,
 				//also checks if all info has been sent
 				String servertemp =null;
+				String activeserver =null;
 				
 				while(!servers.substring(0, 1).contains(".")) {
 					double fit =0;
@@ -119,6 +123,7 @@ public class Best_fit {
 						bestFit = fit;
 						servertemp = servers;
 						minAvail = availtime;
+
 					}
 					else if (bestFit == fit && minAvail > availtime) {
 						minAvail = availtime;
@@ -132,12 +137,57 @@ public class Best_fit {
 				
 				String jobN = getNumb(error, 2);
 				//if no best_fit server is found, return largest server
-				if(servertemp == null) {
-					writeMSG(socket,"SCHD" + jobN + " "+ans+ " 0");;
-				} else {
+			
+				 if(servertemp != null) {
+					
 					String servernum = getNumb(servertemp,1);
 					foundServer = getNumb(servertemp,0);
 					writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum);
+				}
+				
+				else {
+					writeMSG(socket, RESCCapable + job);
+					
+					String serversCapable = readMSG(socket);//sends back DATA
+					
+					writeMSG(socket,OK);//sends OK
+					
+					serversCapable = readMSG(socket);//first server info
+					String foundServerCapable = null;//to put the final server info into
+					
+					double bestFitCapable = Double.MAX_VALUE;
+					double minAvailCapable = Double.MAX_VALUE;
+					
+					while(!serversCapable.substring(0, 1).contains(".")) {
+						double fitCapable =0;
+						double availtimeCapable =0;
+						fitCapable = fitnessvalue(serversCapable, error, 4);
+						availtimeCapable = fitnessvalue(serversCapable, error, 3);
+						
+						if(bestFitCapable > fitCapable && fitCapable >= 0) {
+							bestFitCapable = fitCapable;
+							activeserver = serversCapable;
+							minAvailCapable = availtimeCapable;
+							
+						}
+						else if (bestFitCapable == fitCapable && minAvailCapable > availtimeCapable) {
+							minAvailCapable = availtimeCapable;
+							activeserver = serversCapable;
+							
+						}
+						
+						//activeserver = serversCapable;
+						
+					
+						writeMSG(socket,OK);
+						serversCapable = readMSG(socket); //going through the servers available
+						
+					}
+					
+					String activesnum = getNumb(activeserver,1);
+					foundServerCapable = getNumb(activeserver,0);
+					writeMSG(socket,"SCHD " + jobN + " " + foundServerCapable + " " +activesnum);
+					
 				}
 				
 				//get response
