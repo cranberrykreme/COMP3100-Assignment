@@ -164,7 +164,7 @@ public class Best_fit {
 						fitCapable = fitnessvalue(serversCapable, error, 4);
 						availtimeCapable = fitnessvalue(serversCapable, error, 3);
 						
-						if(bestFitCapable > fitCapable && fitCapable >= 0) {
+						if(bestFitCapable > fitCapable) {
 							bestFitCapable = fitCapable;
 							activeserver = serversCapable;
 							minAvailCapable = availtimeCapable;
@@ -177,6 +177,9 @@ public class Best_fit {
 						}
 						
 						//activeserver = serversCapable;
+						System.out.println(bestFitCapable);
+						System.out.println(minAvailCapable);
+						System.out.println(activeserver);
 						
 					
 						writeMSG(socket,OK);
