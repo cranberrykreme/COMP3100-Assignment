@@ -165,14 +165,22 @@ public class Best_fit {
 						availtimeCapable = fitnessvalue(serversCapable, error, 3);
 						
 						if(bestFitCapable > fitCapable) {
+							if(Integer.parseInt(getNumb(serversCapable,2)) == 3) {
 							bestFitCapable = fitCapable;
+							
+							
 							activeserver = serversCapable;
+							
 							minAvailCapable = availtimeCapable;
+							}
 							
 						}
 						else if (bestFitCapable == fitCapable && minAvailCapable > availtimeCapable) {
+							if(Integer.parseInt(getNumb(serversCapable,2)) == 3) {
 							minAvailCapable = availtimeCapable;
-							activeserver = serversCapable;
+							
+								activeserver = serversCapable;
+							}
 							
 						}
 						
