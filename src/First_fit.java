@@ -30,7 +30,8 @@ public class First_fit {
 	private static final String REDY = "REDY";
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
-	private static final String RESC = "RESC Capable";
+	private static final String RESC = "RESC Avail";
+	private static final String RESCCapable = "RESC Capable";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -123,13 +124,38 @@ public class First_fit {
 				}
 				String jobN = getNumb(error, 2);
 				//job message to server
-				if(foundServer == null) {
-					writeMSG(socket,"SCHD " + jobN + " " + ans + " 0", out);
-				} else {
+//				if(foundServer == null) {
+//					writeMSG(socket,"SCHD " + jobN + " " + ans + " 0", out);
+				 if(foundServer != null) {
 					String servernum = getNumb(foundServer,1);
 					foundServer = getNumb(foundServer,0);
 					writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum,out);
 				}
+				 else {
+					 writeMSG(socket, RESCCapable + job, out);
+						
+						String serversCap = readMSG(socket, in);//sends back DATA
+						
+						writeMSG(socket,OK, out);//sends ok
+						serversCap = readMSG(socket, in);//first server info
+						
+						while(!serversCap.substring(0, 1).contains(".")) {
+							String isAvail = getNumb(serversCap, 3);
+							
+							if(foundServer == null) {
+								foundServer = ff(serversCap, error);
+							}
+
+							writeMSG(socket,OK, out);
+							servers = readMSG(socket, in); //going through the servers available
+							
+						}
+						
+						String servernum = getNumb(foundServer,1);
+						foundServer = getNumb(foundServer,0);
+						writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum,out);
+						
+				 }
 				
 				
 				//get response
