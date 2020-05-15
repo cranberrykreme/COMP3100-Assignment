@@ -34,6 +34,9 @@ public class Best_fit {
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
+	
+	// author: Gary Guan
+	
 	public Best_fit(String address, int port) {
 		try {
 			System.out.println("Attempting connection with " + address + " at port " + port);
@@ -118,13 +121,17 @@ public class Best_fit {
 					double availtime =0;
 					fit = fitnessvalue(servers, error, 4);
 					availtime = fitnessvalue(servers, error, 3);
-					
+					//compares the fitnessvalues
+					//set to the server with a lower value
 					if(bestFit > fit && fit >= 0) {
 						bestFit = fit;
 						servertemp = servers;
 						minAvail = availtime;
 
 					}
+					
+					//in the case fitnessvalue is the same
+					//will determine based on time
 					else if (bestFit == fit && minAvail > availtime) {
 						minAvail = availtime;
 						servertemp = servers;
@@ -146,6 +153,8 @@ public class Best_fit {
 				}
 				
 				else {
+					// in the case that no servers are being returned by avail
+					// use RESC Capable instead
 					writeMSG(socket, RESCCapable + job);
 					
 					String serversCapable = readMSG(socket);//sends back DATA
@@ -156,17 +165,16 @@ public class Best_fit {
 					String foundServerCapable = null;//to put the final server info into
 					double bestFitCapable = Double.MAX_VALUE;
 					double minAvailCapable = Double.MAX_VALUE;
-					
+					//traverse all servers
 					while(!serversCapable.substring(0, 1).contains(".")) {
 						double fitCapable =0;
 						double availtimeCapable =0;
 						fitCapable = fitnessvalue(serversCapable, error, 4);
 						availtimeCapable = fitnessvalue(serversCapable, error, 3);
-						
+						//find which server has less core difference
 						if(bestFitCapable > fitCapable) {
 							if(Integer.parseInt(getNumb(serversCapable,2)) == 3) {
 							bestFitCapable = fitCapable;
-							
 							
 							activeserver = serversCapable;
 							
@@ -181,19 +189,12 @@ public class Best_fit {
 								activeserver = serversCapable;
 							}
 							
-						}
-						
-						//activeserver = serversCapable;
-						System.out.println(bestFitCapable);
-						System.out.println(minAvailCapable);
-						System.out.println(activeserver);
-						
-					
+						}				
 						writeMSG(socket,OK);
 						serversCapable = readMSG(socket); //going through the servers available
 						
 					}
-					
+					//dispatch job to server
 					String activesnum = getNumb(activeserver,1);
 					foundServerCapable = getNumb(activeserver,0);
 					writeMSG(socket,"SCHD " + jobN + " " + foundServerCapable + " " +activesnum);
@@ -317,39 +318,18 @@ public class Best_fit {
 
 	
 	public static Integer fitnessvalue(String address, String job, int spaces) {
+		
+		//uses getNumb to isolate the core 
 		String servercore = getNumb(address, spaces);
 		String jobcore = getNumb(job,spaces);
 		
 		int fv =0;
+		//finds difference between server's cores and job's cores
 		fv = Integer.parseInt(servercore) - Integer.parseInt(jobcore);
 		
 		return fv;
 	}
 	
-	
-	
-	public static String isolatecore(String address, int space) {
-		int count =0;
-		int firstspace = 0;
-		int lastspace = 0;
-		String corenum = null;
-		
-		for(int a=0; a<address.length(); a++) {
-			if(address.charAt(a)== ' ') {
-				count++;
-			}
-			if(count == space) {
-				firstspace = a+1;
-			}
-			if(count == space+1) {
-				lastspace=a;
-			}
-		}
-		
-		corenum = address.substring(firstspace, lastspace);
-		
-		return corenum;
-	}
 	
 	/**
 	 * Finds the number after a certain space
@@ -363,12 +343,12 @@ public class Best_fit {
 		int spc = 0;
 		int subindex = 0;
 		String numb = null;
-		
+		//checker to see if address is too short to be valid
 		if(address.length() < 5) {
 			System.out.println("address is too short at: " + address.length());
 			return null;
 		}
-		
+		//finds the index of the specifed spaces
 		for(int temp = 0; temp < address.length(); temp++) {
 			if(address.charAt(temp) == ' ') {
 				spc++;
@@ -390,7 +370,6 @@ public class Best_fit {
 		} else {
 			finalIndex = address.length();
 		}
-		
 		
 		System.out.println("finalindex is: " + finalIndex);
 		if(spaces != 0) {
