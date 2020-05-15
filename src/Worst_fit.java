@@ -75,7 +75,7 @@ public class Worst_fit {
 					break;
 				}
 				
-				//finding correct resc command for specific job
+				//finding correct RESC command for specific job
 				int spaces = 0;
 				int index = 0;
 				for(int temp = 0; temp < error.length(); temp++) {
@@ -100,11 +100,11 @@ public class Worst_fit {
 			
 				String foundServer = null;
 				
-				//Initialize altfit and worstfit to min value
+				//Initialize altfit and worstfit to MIN value
 				double worstFit = Double.MIN_VALUE;
 				double altFit = Double.MIN_VALUE;
 				
-				//Servers to store the worst ans altfit servers
+				//Servers to store the worst and altfit servers
 				String wf_server = null;
 				String af_server = null;
 				
@@ -183,16 +183,14 @@ public class Worst_fit {
 							wf_serverCapable = serversCapable;
 						}
 						
-						//wf_serverCapable = serversCapable;
-						System.out.println(fitCapable + "      fitcap this one here");
-						System.out.println(serversCapable + "      servers this one here");
-						System.out.println(error + "     jobs this one here");
+					
 						writeMSG(socket,OK);
 						serversCapable = readMSG(socket); 
 						
 						
 					}
-						
+					
+					//Get the server
 					String activenum = getNumb(wf_serverCapable,1);
 					foundServerCapable = getNumb(wf_serverCapable,0);
 					writeMSG(socket,"SCHD " + jobN + " " + foundServerCapable + " " +activenum);
