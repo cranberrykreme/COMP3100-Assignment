@@ -94,15 +94,17 @@ public class Worst_fit {
 				
 				String servers = readMSG(socket);//sends back DATA
 				
-				writeMSG(socket,OK);//sends ok
+				writeMSG(socket,OK);//sends OK
 				
 				servers = readMSG(socket);//first server info
 			
 				String foundServer = null;
-
+				
+				//Initialize altfit and worstfit to min value
 				double worstFit = Double.MIN_VALUE;
 				double altFit = Double.MIN_VALUE;
 				
+				//Servers to store the worst ans altfit servers
 				String wf_server = null;
 				String af_server = null;
 				
@@ -116,6 +118,8 @@ public class Worst_fit {
 					
 					String serverState = getNumb(servers,2);
 					
+					
+					//check the fitness value and if server is immediately available
 					if((fitness_val > worstFit)  && (Integer.parseInt(serverState) == 2 ||Integer.parseInt(serverState) == 3))
 					{
 						worstFit = fitness_val;
@@ -136,11 +140,14 @@ public class Worst_fit {
 				
 				String jobN = getNumb(error, 2);
 				
+				//If worst fit server is found assign the job 
 				if(wf_server != null) {
 					String servernum = getNumb(wf_server,1);
 					foundServer = getNumb(wf_server,0);
 					writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum);
 				}
+				
+				//If alt fit server is found assign the job 
 				else if(af_server != null) {
 					String servernum = getNumb(af_server,1);
 					foundServer = getNumb(af_server,0);
@@ -148,7 +155,7 @@ public class Worst_fit {
 				}
 				
 				
-				
+				//else assign jobs based on initial resource capacity
 				else {
 					writeMSG(socket, RESCCapable + job);
 					String serversCapable = readMSG(socket);//sends back DATA
@@ -313,8 +320,6 @@ public class Worst_fit {
 	 * Calculate the fitness value
 	 * 
 	 */
-	
-	
 	public static int Fitness_val(String address, String job, int spaces) {
 		String servercore = getNumb(address, spaces);
 		String jobcore = getNumb(job,spaces);
