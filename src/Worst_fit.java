@@ -157,6 +157,8 @@ public class Worst_fit {
 				
 				//else assign jobs based on initial resource capacity
 				else {
+					
+					//uses RESC Capable to find server for job
 					writeMSG(socket, RESCCapable + job);
 					String serversCapable = readMSG(socket);//sends back DATA
 					
@@ -171,7 +173,6 @@ public class Worst_fit {
 					while(!serversCapable.substring(0, 1).contains(".")) {
 						
 						double fitCapable = Fitness_val(serversCapable, error, 4);
-						
 						if(fitCapable >= worstFitCap || Integer.parseInt(getNumb(serversCapable,2)) == 3) {
 							worstFitCap = fitCapable;
 							wf_serverCapable = serversCapable;
