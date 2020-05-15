@@ -130,7 +130,7 @@ public class Best_fit {
 
 					}
 					
-					//in the case fitnessvalue is the same
+					//in the case fitnessvalue is the same (uh oh)
 					//will determine based on time
 					else if (bestFit == fit && minAvail > availtime) {
 						minAvail = availtime;
