@@ -160,7 +160,7 @@ public class Worst_fit {
 					String wf_serverCapable = null;
 					
 					double worstFitCap = Double.MIN_VALUE;
-				
+					double altFitCap = Double.MIN_VALUE;
 					while(!serversCapable.substring(0, 1).contains(".")) {
 						
 						double fitCapable = Fitness_val(serversCapable, error, 4);
@@ -170,6 +170,11 @@ public class Worst_fit {
 							wf_serverCapable = serversCapable;
 						}
 						
+						else if(fitCapable >= altFitCap || Integer.parseInt(getNumb(serversCapable,2)) == 0){
+							
+							altFitCap = fitCapable;
+							wf_serverCapable = serversCapable;
+						}
 						
 						//wf_serverCapable = serversCapable;
 						System.out.println(fitCapable + "      fitcap this one here");
