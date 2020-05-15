@@ -171,7 +171,7 @@ public class Worst_fit {
 						if(fitCapable > worstFitCapable && (Integer.parseInt(serverState) == 3)) {
 							
 							worstFitCapable = fitCapable;
-							wf_server = serversCapable;
+							wf_serverCapable = serversCapable;
 						}
 						
 						writeMSG(socket,OK);
