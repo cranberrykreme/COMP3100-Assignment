@@ -31,6 +31,7 @@ public class Worst_fit {
 	private static final String NONE = "NONE";
 	private static final String ERR = "ERR: No such waiting job exists";
 	private static final String RESC = "RESC Avail";
+	private static final String RESCCapable = "RESC Capable";
 	private static final String OK = "OK";
 	private static final String ERR2 = "ERR: invalid command (OK)";
 	
@@ -67,7 +68,6 @@ public class Worst_fit {
 			 * method for going through the servers
 			 * and picking the right server for each job
 			 */
-			int i = 0;
 			while(true) {
 				//reading job from server
 				String error = readMSG(socket);
@@ -94,7 +94,7 @@ public class Worst_fit {
 				writeMSG(socket, RESC + job);
 				
 				String servers = readMSG(socket);//sends back DATA
-				System.out.println(servers);
+				
 				writeMSG(socket,OK);//sends ok
 				
 				servers = readMSG(socket);//first server info
@@ -135,18 +135,54 @@ public class Worst_fit {
 					
 				}
 				
+				String jobN = getNumb(error, 2);
+				
 				if(wf_server != null) {
 					String servernum = getNumb(wf_server,1);
 					foundServer = getNumb(wf_server,0);
-					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+					writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum);
 				}
 				else if(af_server != null) {
 					String servernum = getNumb(af_server,1);
 					foundServer = getNumb(af_server,0);
-					writeMSG(socket,"SCHD " + i + " " + foundServer + " " +servernum);
+					writeMSG(socket,"SCHD " + jobN + " " + foundServer + " " +servernum);
 				}
 				else {
-					writeMSG(socket,"SCHD" + i + " "+ ans + " 0");
+					writeMSG(socket, RESCCapable + job);
+					
+					String serversCapable = readMSG(socket);//sends back DATA
+					
+					writeMSG(socket,OK);//sends OK
+					
+					serversCapable = readMSG(socket);//first server info
+					String foundServerCapable = null;
+					
+					worstFit = Double.MIN_VALUE;
+					wf_server = null;
+					
+					String serverState = getNumb(serversCapable,2);
+					
+					
+					while(!serversCapable.substring(0, 1).contains(".")) {
+						double fitCapable =0;
+						
+						fitCapable = Fitness_val(serversCapable, error, 4);
+					
+						
+						if(fitCapable > worstFit && (Integer.parseInt(serverState) == 2)) {
+							
+							worstFit = fitCapable;
+							wf_server = serversCapable;
+						}
+						
+						writeMSG(socket,OK);
+						serversCapable = readMSG(socket); 
+					}
+						
+					String activesnum = getNumb(wf_server,1);
+					foundServerCapable = getNumb(wf_server,0);
+					writeMSG(socket,"SCHD " + jobN + " " + foundServerCapable + " " +activesnum);
+	
 				}
 
 
@@ -159,7 +195,7 @@ public class Worst_fit {
 				
 				//send REDY
 				writeMSG(socket, REDY);
-				i++;
+		
 			}
 			
 			//LAST STAGE: QUIT
