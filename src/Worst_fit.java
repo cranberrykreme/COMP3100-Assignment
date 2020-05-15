@@ -159,28 +159,31 @@ public class Worst_fit {
 					String foundServerCapable = null;
 					String wf_serverCapable = null;
 					
-					
-					
 					double worstFitCap = Double.MIN_VALUE;
 					double altFitCap = Double.MIN_VALUE;
 					while(!serversCapable.substring(0, 1).contains(".")) {
 						
-						double fitCapable =0;
-						fitCapable = Fitness_val(serversCapable, error, 4);
+						double fitCapable = Fitness_val(serversCapable, error, 4);
 						
-						if(fitCapable > worstFitCap ) {
+						if(fitCapable >= worstFitCap || Integer.parseInt(getNumb(serversCapable,2)) == 3) {
 							worstFitCap = fitCapable;
 							wf_serverCapable = serversCapable;
 						}
 						
-						else if(fitCapable > altFitCap){
-							worstFitCap = altFitCap;
+						else if(fitCapable >= altFitCap || Integer.parseInt(getNumb(serversCapable,2)) == 0){
+							
+							altFitCap = fitCapable;
 							wf_serverCapable = serversCapable;
 						}
 						
-						
+						//wf_serverCapable = serversCapable;
+						System.out.println(fitCapable + "      fitcap this one here");
+						System.out.println(serversCapable + "      servers this one here");
+						System.out.println(error + "     jobs this one here");
 						writeMSG(socket,OK);
 						serversCapable = readMSG(socket); 
+						
+						
 					}
 						
 					String activenum = getNumb(wf_serverCapable,1);
