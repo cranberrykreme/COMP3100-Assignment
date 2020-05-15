@@ -147,7 +147,7 @@ public class First_fit {
 							}
 
 							writeMSG(socket,OK, out);
-							servers = readMSG(socket, in); //going through the servers available
+							serversCap = readMSG(socket, in); //going through the servers available
 							
 						}
 						
