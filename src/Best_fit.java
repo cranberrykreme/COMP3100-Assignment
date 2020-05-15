@@ -155,6 +155,9 @@ public class Best_fit {
 					serversCapable = readMSG(socket);//first server info
 					String foundServerCapable = null;//to put the final server info into
 					
+					
+					
+					
 					double bestFitCapable = Double.MAX_VALUE;
 					double minAvailCapable = Double.MAX_VALUE;
 					

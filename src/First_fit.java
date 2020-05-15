@@ -143,7 +143,9 @@ public class First_fit {
 							String isAvail = getNumb(serversCap, 3);
 							
 							if(foundServer == null) {
+								if(Integer.parseInt(getNumb(serversCap,2)) == 3 || Integer.parseInt(getNumb(serversCap,2)) ==2 ) {
 								foundServer = ff(serversCap, error);
+								}
 							}
 
 							writeMSG(socket,OK, out);
