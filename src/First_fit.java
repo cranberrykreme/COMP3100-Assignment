@@ -62,7 +62,7 @@ public class First_fit {
 			//File file = new File("system.xml");
 			//File file = new File("/Users/chrispurkiss/ds-sim/system.xml");
 			String ans = parse(file);
-			System.out.println(ans);
+			System.out.println(ans);//not needed
 			
 			//second message from server
 			readMSG(socket, in);
